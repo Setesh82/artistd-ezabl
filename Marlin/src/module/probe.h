@@ -145,42 +145,35 @@ public:
       }
     #endif
 
-    static inline float min_x() {
-      return (
-        #if IS_KINEMATIC
-          (X_CENTER) - probe_radius()
-        #else
-          _MAX((X_MIN_BED) + (PROBING_MARGIN_LEFT), (X_MIN_POS) + offset_xy.x)
-        #endif
+    static constexpr float _min_x(const xy_pos_t &probe_offset_xy = offset_xy) {
+      return TERN(IS_KINEMATIC,
+        (X_CENTER) - probe_radius(probe_offset_xy),
+        _MAX((X_MIN_BED) + (PROBING_MARGIN_LEFT), (X_MIN_POS) + probe_offset_xy.x)
       );
     }
-    static inline float max_x() {
-      return (
-        #if IS_KINEMATIC
-          (X_CENTER) + probe_radius()
-        #else
-          _MIN((X_MAX_BED) - (PROBING_MARGIN_RIGHT), (X_MAX_POS) + offset_xy.x)
-        #endif
+    static constexpr float _max_x(const xy_pos_t &probe_offset_xy = offset_xy) {
+      return TERN(IS_KINEMATIC,
+        (X_CENTER) + probe_radius(probe_offset_xy),
+        _MIN((X_MAX_BED) - (PROBING_MARGIN_RIGHT), (X_MAX_POS) + probe_offset_xy.x)
       );
     }
-    static inline float min_y() {
-      return (
-        #if IS_KINEMATIC
-          (Y_CENTER) - probe_radius()
-        #else
-          _MAX((Y_MIN_BED) + (PROBING_MARGIN_FRONT), (Y_MIN_POS) + offset_xy.y)
-        #endif
+    static constexpr float _min_y(const xy_pos_t &probe_offset_xy = offset_xy) {
+      return TERN(IS_KINEMATIC,
+        (Y_CENTER) - probe_radius(probe_offset_xy),
+        _MAX((Y_MIN_BED) + (PROBING_MARGIN_FRONT), (Y_MIN_POS) + probe_offset_xy.y)
       );
     }
-    static inline float max_y() {
-      return (
-        #if IS_KINEMATIC
-          (Y_CENTER) + probe_radius()
-        #else
-          _MIN((Y_MAX_BED) - (PROBING_MARGIN_BACK), (Y_MAX_POS) + offset_xy.y)
-        #endif
+    static constexpr float _max_y(const xy_pos_t &probe_offset_xy = offset_xy) {
+      return TERN(IS_KINEMATIC,
+        (Y_CENTER) + probe_radius(probe_offset_xy),
+        _MIN((Y_MAX_BED) - (PROBING_MARGIN_BACK), (Y_MAX_POS) + probe_offset_xy.y)
       );
     }
+
+    static float min_x() { return _min_x() TERN_(NOZZLE_AS_PROBE, TERN_(HAS_HOME_OFFSET, - home_offset.x)); }
+    static float max_x() { return _max_x() TERN_(NOZZLE_AS_PROBE, TERN_(HAS_HOME_OFFSET, - home_offset.x)); }
+    static float min_y() { return _min_y() TERN_(NOZZLE_AS_PROBE, TERN_(HAS_HOME_OFFSET, - home_offset.y)); }
+    static float max_y() { return _max_y() TERN_(NOZZLE_AS_PROBE, TERN_(HAS_HOME_OFFSET, - home_offset.y)); }
 
     #if NEEDS_THREE_PROBE_POINTS
       // Retrieve three points to probe the bed. Any type exposing set(X,Y) may be used.

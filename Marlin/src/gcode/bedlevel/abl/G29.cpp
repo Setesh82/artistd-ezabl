@@ -382,6 +382,10 @@ G29_TYPE GcodeSuite::G29() {
       }
 
       if (!probe.good_bounds(probe_position_lf, probe_position_rb)) {
+        SERIAL_ECHOLNPAIR("probe_position_lf.x = ", probe_position_lf.x);
+        SERIAL_ECHOLNPAIR("probe_position_lf.y = ", probe_position_lf.y);
+        SERIAL_ECHOLNPAIR("probe_position_rb.x = ", probe_position_rb.x);
+        SERIAL_ECHOLNPAIR("probe_position_rb.y = ", probe_position_rb.y);
         SERIAL_ECHOLNPGM("? (L,R,F,B) out of bounds.");
         G29_RETURN(false);
       }
